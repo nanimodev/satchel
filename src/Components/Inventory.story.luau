@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Inventory = require("./Inventory")
 
+const e = React.createElement
+
 const controls = {
 	toolName = "Sword",
 	toolImage = "rbxasset://Textures/Sword128.png",
@@ -22,7 +24,7 @@ return {
 		tool.TextureId = props.controls.toolImage
 		tool.ToolTip = props.controls.tooltipText
 
-		return React.createElement(Inventory, {
+		return e(Inventory, {
 			rows = props.controls.rows,
 			width = 655,
 			items = { [1] = tool },

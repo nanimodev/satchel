@@ -3,19 +3,21 @@ const ReactRoblox = require("../../react-roblox")
 
 const DESIGN_SHEET = script.Parent.Parent.Design.SatchelStyleSheet
 
+const e = React.createElement
+
 return {
 	name = "Satchel",
 	mapStory = function(Story)
 		return function(storyProps)
-			return React.createElement(React.Fragment, nil, {
-				UIListLayout = React.createElement("UIListLayout", {
+			return e(React.Fragment, nil, {
+				UIListLayout = e("UIListLayout", {
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 				}),
-				StyleLink = React.createElement("StyleLink", {
+				StyleLink = e("StyleLink", {
 					StyleSheet = DESIGN_SHEET,
 				}),
-				Story = React.createElement(Story, storyProps),
+				Story = e(Story, storyProps),
 			})
 		end
 	end,

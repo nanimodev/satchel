@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Tooltip = require("./Tooltip")
 
+const e = React.createElement
+
 export type Props = {
 	item: (Tool | HopperBin)?,
 	equipped: boolean?,
@@ -45,7 +47,7 @@ const function Slot(props: Props)
 		slotText = ""
 	end
 
-	return React.createElement("TextButton", {
+	return e("TextButton", {
 		Text = slotText,
 		LayoutOrder = props.order,
 		[React.Tag] = tags,
@@ -55,15 +57,15 @@ const function Slot(props: Props)
 			end
 		end :: any,
 	}, {
-		NumberHint = React.createElement("TextLabel", {
+		NumberHint = e("TextLabel", {
 			Text = slotNumber,
 			Visible = hintVisible,
 			[React.Tag] = "SlotNumber",
 		}),
-		TextureIcon = React.createElement("ImageLabel", {
+		TextureIcon = e("ImageLabel", {
 			Image = itemImage or "",
 		}),
-		ToolTip = React.createElement(Tooltip, {
+		ToolTip = e(Tooltip, {
 			text = tooltipText,
 		}),
 	})

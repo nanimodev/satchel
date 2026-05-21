@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const InventoryHint = require("./InventoryHint")
 
+const e = React.createElement
+
 const controls = {
 	text = "Remove from Hotbar",
 }
@@ -15,7 +17,7 @@ return {
 	summary = "Hint shown in the inventory",
 	controls = controls,
 	story = function(props: Props)
-		return React.createElement(InventoryHint, {
+		return e(InventoryHint, {
 			keyCode = Enum.KeyCode.ButtonX,
 			forceVisible = true,
 			text = props.controls.text,

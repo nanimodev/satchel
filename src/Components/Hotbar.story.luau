@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Hotbar = require("./Hotbar")
 
+const e = React.createElement
+
 const controls = {
 	slots = 10,
 	toolName = "Sword",
@@ -24,7 +26,7 @@ return {
 		tool.TextureId = props.controls.toolImage
 		tool.ToolTip = props.controls.tooltipText
 
-		return React.createElement(Hotbar, {
+		return e(Hotbar, {
 			slots = props.controls.slots,
 			items = { [props.controls.toolSlot] = tool },
 			opened = props.controls.opened,

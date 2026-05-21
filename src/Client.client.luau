@@ -20,6 +20,8 @@ const App = require("./Components/App")
 
 const DESIGN_SHEET = script.Parent.Design.SatchelStyleSheet
 
+const e = React.createElement
+
 const player = Players.LocalPlayer :: Player
 const playerGui = player:WaitForChild("PlayerGui") :: PlayerGui
 
@@ -104,16 +106,16 @@ const function Satchel()
 		end
 	end, {})
 
-	return React.createElement(App, {
+	return e(App, {
 		slots = slots,
 		rows = rows,
 		opened = opened,
 	})
 end
 
-root:render(React.createElement(React.Fragment, nil, {
-	StyleLink = React.createElement("StyleLink", {
+root:render(e(React.Fragment, nil, {
+	StyleLink = e("StyleLink", {
 		StyleSheet = DESIGN_SHEET,
 	}),
-	App = React.createElement(Satchel),
+	App = e(Satchel),
 }))

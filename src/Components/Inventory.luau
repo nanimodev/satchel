@@ -3,6 +3,8 @@ const React = require("../../react")
 const Searchbar = require("./Searchbar")
 const Slot = require("./Slot")
 
+const e = React.createElement
+
 export type Props = {
 	width: number?,
 	rows: number?,
@@ -21,7 +23,7 @@ const function Inventory(props: Props)
 	if props.items then
 		for order, item in props.items do
 			if item then
-				children[tostring(order)] = React.createElement(Slot, {
+				children[tostring(order)] = e(Slot, {
 					unlocked = true,
 					order = order,
 					item = item,
@@ -30,13 +32,13 @@ const function Inventory(props: Props)
 		end
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		Size = UDim2.fromOffset(width, 0),
 		Visible = props.opened,
 		[React.Tag] = "Inventory",
 	}, {
-		SearchBox = React.createElement(Searchbar),
-		SlotFrame = React.createElement("ScrollingFrame", {
+		SearchBox = e(Searchbar),
+		SlotFrame = e("ScrollingFrame", {
 			Size = UDim2.new(1, 0, 0, height),
 		}, children),
 	})

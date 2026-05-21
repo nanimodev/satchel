@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Slot = require("./Slot")
 
+const e = React.createElement
+
 export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
@@ -21,7 +23,7 @@ const function Hotbar(props: Props)
 
 		-- Only show slots if the hotbar is opened or if there is a tool in the slot
 		if props.opened or item then
-			children[tostring(order)] = React.createElement(Slot, {
+			children[tostring(order)] = e(Slot, {
 				order = order,
 				item = item,
 				hint = true,
@@ -31,7 +33,7 @@ const function Hotbar(props: Props)
 		end
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		[React.Tag] = "Hotbar",
 	}, children)
 end

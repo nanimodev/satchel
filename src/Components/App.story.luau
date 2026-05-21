@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const App = require("./App")
 
+const e = React.createElement
+
 const controls = {
 	hintVisible = true,
 	slots = 10,
@@ -26,7 +28,7 @@ return {
 		tool.TextureId = props.controls.toolImage
 		tool.ToolTip = props.controls.toolTooltip
 
-		return React.createElement(App, {
+		return e(App, {
 			forceGamepadHintVisible = props.controls.hintVisible,
 			slots = props.controls.slots,
 			items = { [props.controls.toolSlot] = tool },

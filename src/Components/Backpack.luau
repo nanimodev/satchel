@@ -3,6 +3,8 @@ const React = require("../../react")
 const Hotbar = require("./Hotbar")
 const Inventory = require("./Inventory")
 
+const e = React.createElement
+
 export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
@@ -29,7 +31,7 @@ const function Backpack(props: Props)
 		end
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		[React.Tag] = "Backpack",
 		[React.Change.AbsoluteSize] = function(rbx)
 			if props.onAbsoluteSizeChanged then
@@ -37,13 +39,13 @@ const function Backpack(props: Props)
 			end
 		end :: any,
 	}, {
-		Hotbar = React.createElement(Hotbar, {
+		Hotbar = e(Hotbar, {
 			forceKeyboardHintVisible = props.forceKeyboardHintVisible,
 			slots = slots,
 			items = hotbarItems,
 			opened = opened,
 		}),
-		Inventory = React.createElement(Inventory, {
+		Inventory = e(Inventory, {
 			slots = slots,
 			rows = props.rows,
 			items = inventoryItems,

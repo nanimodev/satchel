@@ -2,6 +2,8 @@ const UserInputService = game:GetService("UserInputService")
 
 const React = require("../../react")
 
+const e = React.createElement
+
 export type Props = {
 	keyCode: Enum.KeyCode,
 	text: string,
@@ -15,14 +17,14 @@ const function InventoryHint(props: Props)
 		tags = tags .. " Visible"
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		LayoutOrder = props.order,
 		[React.Tag] = tags,
 	}, {
-		KeyCode = React.createElement("ImageLabel", {
+		KeyCode = e("ImageLabel", {
 			Image = UserInputService:GetImageForKeyCode(props.keyCode),
 		}),
-		Action = React.createElement("TextLabel", {
+		Action = e("TextLabel", {
 			Text = props.text,
 		}),
 	})

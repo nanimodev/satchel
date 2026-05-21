@@ -1,5 +1,7 @@
 const React = require("../../react")
 
+const e = React.createElement
+
 export type Props = {
 	size: UDim2?,
 }
@@ -7,7 +9,7 @@ export type Props = {
 const function Searchbar(props: Props)
 	const text, setText = React.useState("")
 
-	return React.createElement("TextBox", {
+	return e("TextBox", {
 		Size = props.size,
 		Text = text,
 		[React.Tag] = "Searchbar",
@@ -15,7 +17,7 @@ const function Searchbar(props: Props)
 			setText(rbx.Text)
 		end :: any,
 	}, {
-		Clear = React.createElement("ImageButton", {
+		Clear = e("ImageButton", {
 			Visible = text ~= "",
 			[React.Event.Activated] = function()
 				setText("")

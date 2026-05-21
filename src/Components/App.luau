@@ -13,6 +13,8 @@ const HotbarBindings = script.Parent.Parent.Bindings.HotbarContext
 const SlotLeftGamepadKeyCode = HotbarBindings.SlotLeftAction.GamepadBinding.KeyCode
 const SlotRightGamepadKeyCode = HotbarBindings.SlotRightAction.GamepadBinding.KeyCode
 
+const e = React.createElement
+
 export type Props = {
 	forceGamepadHintVisible: boolean?,
 	forceKeyboardHintVisible: boolean?,
@@ -38,48 +40,48 @@ const function App(props: Props)
 		end
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		[React.Tag] = "HotbarHints",
 	}, {
-		SlotLeftHint = React.createElement(HotbarHint, {
+		SlotLeftHint = e(HotbarHint, {
 			keyCode = SlotLeftGamepadKeyCode,
 			forceVisible = props.forceGamepadHintVisible,
 			order = -1,
 			visible = hotbarVisible,
 		}),
-		SlotRightHint = React.createElement(HotbarHint, {
+		SlotRightHint = e(HotbarHint, {
 			keyCode = SlotRightGamepadKeyCode,
 			forceVisible = props.forceGamepadHintVisible,
 			order = 1,
 			visible = hotbarVisible,
 		}),
-		InventoryHints = React.createElement("Frame", {
+		InventoryHints = e("Frame", {
 			Size = UDim2.fromOffset(backpackSize.X, 0),
 			[React.Tag] = "InventoryHints",
 		}, {
-			Hints = React.createElement("Frame", {
+			Hints = e("Frame", {
 				Size = UDim2.fromOffset(backpackSize.X, 0),
 				Visible = props.opened,
 				LayoutOrder = -1,
 				[React.Tag] = "Hints",
 			}, {
-				RemoveFromHotbarHint = React.createElement(InventoryHint, {
+				RemoveFromHotbarHint = e(InventoryHint, {
 					keyCode = RemoveFromHotbarGamepadKeyCode,
 					forceVisible = props.forceGamepadHintVisible,
 					text = "Remove from hotbar",
 				}),
-				SelectSwapHint = React.createElement(InventoryHint, {
+				SelectSwapHint = e(InventoryHint, {
 					keyCode = SelectSwapGamepadKeyCode,
 					forceVisible = props.forceGamepadHintVisible,
 					text = "Select/Swap",
 				}),
-				CloseInventoryHint = React.createElement(InventoryHint, {
+				CloseInventoryHint = e(InventoryHint, {
 					keyCode = CloseInventoryGamepadKeyCode,
 					forceVisible = props.forceGamepadHintVisible,
 					text = "Close inventory",
 				}),
 			}),
-			Backpack = React.createElement(Backpack, {
+			Backpack = e(Backpack, {
 				forceKeyboardHintVisible = props.forceKeyboardHintVisible,
 				slots = props.slots,
 				rows = props.rows,

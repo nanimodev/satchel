@@ -2,6 +2,8 @@ const UserInputService = game:GetService("UserInputService")
 
 const React = require("../../react")
 
+const e = React.createElement
+
 export type Props = {
 	keyCode: Enum.KeyCode,
 	forceVisible: boolean?,
@@ -15,12 +17,12 @@ const function HotbarHint(props: Props)
 		tags = tags .. " Visible"
 	end
 
-	return React.createElement("Frame", {
+	return e("Frame", {
 		LayoutOrder = props.order,
 		Visible = props.visible,
 		[React.Tag] = tags,
 	}, {
-		KeyCode = React.createElement("ImageLabel", {
+		KeyCode = e("ImageLabel", {
 			Image = UserInputService:GetImageForKeyCode(props.keyCode),
 		}),
 	})

@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Backpack = require("./Backpack")
 
+const e = React.createElement
+
 const controls = {
 	slots = 10,
 	toolName = "Sword",
@@ -25,7 +27,7 @@ return {
 		tool.TextureId = props.controls.toolImage
 		tool.ToolTip = props.controls.toolTooltip
 
-		return React.createElement(Backpack, {
+		return e(Backpack, {
 			slots = props.controls.slots,
 			items = { [props.controls.toolSlot] = tool },
 			opened = props.controls.opened,

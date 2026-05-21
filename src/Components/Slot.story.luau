@@ -2,6 +2,8 @@ const React = require("../../react")
 
 const Slot = require("./Slot")
 
+const e = React.createElement
+
 const controls = {
 	toolName = "Sword",
 	toolImage = "rbxasset://Textures/Sword128.png",
@@ -25,7 +27,7 @@ return {
 		tool.TextureId = props.controls.toolImage
 		tool.ToolTip = props.controls.toolTooltip
 
-		return React.createElement(Slot, {
+		return e(Slot, {
 			item = tool,
 			equipped = props.controls.equipped,
 			unlocked = props.controls.unlocked,
