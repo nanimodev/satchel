@@ -11,7 +11,9 @@ type DefaultThemes = "DefaultTheme" | "LegacyTheme"
 const function setTheme(theme: DefaultThemes | StyleSheet): ()
 	assert(RunService:IsClient(), "setTheme can only be called on the client")
 
-	const newTheme: StyleSheet = if typeof(theme) == "string" then styleSheets:WaitForChild(theme) :: StyleSheet else theme
+	const newTheme: StyleSheet = if typeof(theme) == "string"
+		then styleSheets:WaitForChild(theme) :: StyleSheet
+		else theme
 	currentTheme.StyleSheet = newTheme
 
 	bindableEvents.ThemeChanged:Fire(newTheme, currentTheme.StyleSheet)
