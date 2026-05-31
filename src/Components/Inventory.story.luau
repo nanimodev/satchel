@@ -8,6 +8,7 @@ const controls = {
 	toolName = "Sword",
 	toolImage = "rbxasset://Textures/Sword128.png",
 	tooltipText = "A classic sword",
+	toolEquipped = false,
 	rows = 4,
 }
 
@@ -27,7 +28,12 @@ return {
 		return e(Inventory, {
 			rows = props.controls.rows,
 			width = 655,
-			items = { [1] = { item = tool, equipped = false } },
+			items = {
+				[1] = {
+					item = tool,
+					equipped = props.controls.toolEquipped,
+				},
+			},
 		})
 	end,
 }

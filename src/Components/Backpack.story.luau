@@ -10,6 +10,7 @@ const controls = {
 	toolImage = "rbxasset://Textures/Sword128.png",
 	toolTooltip = "A classic sword",
 	toolSlot = 1,
+	toolEquipped = false,
 	opened = true,
 	rows = 4,
 }
@@ -29,7 +30,12 @@ return {
 
 		return e(Backpack, {
 			slots = props.controls.slots,
-			items = { [props.controls.toolSlot] = { item = tool, equipped = false } },
+			items = {
+				[props.controls.toolSlot] = {
+					item = tool,
+					equipped = props.controls.toolEquipped,
+				},
+			},
 			opened = props.controls.opened,
 			rows = props.controls.rows,
 		})

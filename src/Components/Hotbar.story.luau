@@ -10,6 +10,7 @@ const controls = {
 	toolImage = "rbxasset://Textures/Sword128.png",
 	tooltipText = "A classic sword",
 	toolSlot = 1,
+	toolEquipped = false,
 	opened = true,
 }
 
@@ -28,7 +29,12 @@ return {
 
 		return e(Hotbar, {
 			slots = props.controls.slots,
-			items = { [props.controls.toolSlot] = { item = tool, equipped = false } },
+			items = {
+				[props.controls.toolSlot] = {
+					item = tool,
+					equipped = props.controls.toolEquipped,
+				},
+			},
 			opened = props.controls.opened,
 		})
 	end,
