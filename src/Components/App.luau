@@ -28,6 +28,15 @@ export type Props = {
 const function App(props: Props)
 	const backpackSize, setBackpackSize = React.useState(Vector2.zero)
 	const slotCount = props.slots or 10
+	const width = slotCount * 65 + 5
+
+	const function onBackpackAbsoluteSizeChanged(size: Vector2)
+		if not props.opened then
+			setBackpackSize(size)
+		end
+	end
+
+	const backpackWidth = if props.opened then width else backpackSize.X
 
 	local hotbarVisible = props.opened or false
 
@@ -57,11 +66,11 @@ const function App(props: Props)
 			visible = hotbarVisible,
 		}),
 		InventoryHints = e("Frame", {
-			Size = UDim2.fromOffset(backpackSize.X, 0),
+			Size = UDim2.fromOffset(backpackWidth, 0),
 			[React.Tag] = "InventoryHints",
 		}, {
 			Hints = e("Frame", {
-				Size = UDim2.fromOffset(backpackSize.X, 0),
+				Size = UDim2.fromOffset(backpackWidth, 0),
 				Visible = props.opened,
 				LayoutOrder = -1,
 				[React.Tag] = "Hints",
@@ -88,8 +97,9 @@ const function App(props: Props)
 				rows = props.rows,
 				items = props.items,
 				opened = props.opened,
+				width = width,
 				onSlotActivated = props.onSlotActivated,
-				onAbsoluteSizeChanged = setBackpackSize,
+				onAbsoluteSizeChanged = onBackpackAbsoluteSizeChanged,
 			}),
 		}),
 	})

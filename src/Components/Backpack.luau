@@ -11,6 +11,7 @@ export type Props = {
 	rows: number?, -- TODO: Add rows for inventory height
 	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
 	opened: boolean?,
+	width: number?,
 	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
 	onAbsoluteSizeChanged: ((Vector2) -> ())?,
 }
@@ -48,7 +49,7 @@ const function Backpack(props: Props)
 			onSlotActivated = props.onSlotActivated,
 		}),
 		Inventory = e(Inventory, {
-			slots = slots,
+			width = props.width,
 			rows = props.rows,
 			items = inventoryItems,
 			opened = opened,
