@@ -20,7 +20,7 @@ const function Slot(props: Props)
 	const itemImage = item and item.TextureId
 	const tooltipText = item and (item:IsA("Tool") and item.ToolTip or "")
 
-	local equipped = props.equipped or false
+	const equipped = props.equipped or false
 
 	-- Only show numbers 1-10 for hints and show 0 for the 10th slot
 	const order = props.order or 1
