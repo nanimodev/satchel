@@ -1,0 +1,275 @@
+--!strict
+
+export type SlotItem = {
+	item: Tool | HopperBin,
+	equipped: boolean,
+}
+
+export type Snapshot = {
+	items: { [number]: SlotItem },
+}
+
+export type Controller = {
+	getSnapshot: () -> Snapshot,
+	activateItem: (item: Tool | HopperBin) -> (),
+	setHotbarSlotCount: (count: number) -> (),
+	subscribe: (listener: () -> ()) -> () -> (),
+	destroy: () -> (),
+}
+
+local function isInventoryItem(item: Instance, backpack: Backpack?, character: Model?): boolean
+	local parent = item.Parent
+	return parent == backpack or parent == character
+end
+
+local function create(player: Player, bindableEvents: Folder): Controller
+	local backpackItemAdded = bindableEvents.BackpackItemAdded
+	local backpackItemRemoved = bindableEvents.BackpackItemRemoved
+	local backpackItemEquipped = bindableEvents.BackpackItemEquipped
+	local backpackItemUnequipped = bindableEvents.BackpackItemUnequipped
+
+	local hotbarSlotCount = 10
+	local items: { [number]: Tool | HopperBin } = {}
+	local itemToSlot: { [Tool | HopperBin]: number } = {}
+	local trackedItems: { [Tool | HopperBin]: { state: string, connection: RBXScriptConnection? } } = {}
+	local listeners: { () -> () } = {}
+	local connections: { RBXScriptConnection } = {}
+
+	local character: Model? = nil
+	local backpack: Backpack? = nil
+
+	local function notify()
+		for _, listener in listeners do
+			listener()
+		end
+	end
+
+	local function isEquipped(item: Tool | HopperBin): boolean
+		if item:IsA("HopperBin") then
+			return item.Active
+		elseif item:IsA("Tool") then
+			return character ~= nil and item.Parent == character
+		end
+		return false
+	end
+
+	local function findLowestEmptySlot(): number
+		for index = 1, hotbarSlotCount do
+			if items[index] == nil then
+				return index
+			end
+		end
+		local maxIndex = hotbarSlotCount
+		for index in items do
+			if index > maxIndex then
+				maxIndex = index
+			end
+		end
+		return maxIndex + 1
+	end
+
+	local function removeFromSlots(item: Tool | HopperBin)
+		local slotIndex = itemToSlot[item]
+		if slotIndex then
+			items[slotIndex] = nil
+			itemToSlot[item] = nil
+		end
+	end
+
+	local function handleItemState(item: Tool | HopperBin)
+		local equipped = isEquipped(item)
+		local currentState = if equipped then "Equipped" else "Unequipped"
+
+		local record = trackedItems[item]
+		if not record then
+			if not isInventoryItem(item, backpack, character) then
+				return
+			end
+
+			local slotIndex = findLowestEmptySlot()
+			items[slotIndex] = item
+			itemToSlot[item] = slotIndex
+
+			trackedItems[item] = {
+				state = currentState,
+				connection = nil,
+			}
+
+			backpackItemAdded:Fire(item)
+
+			if item:IsA("HopperBin") then
+				trackedItems[item].connection = item:GetPropertyChangedSignal("Active"):Connect(function()
+					handleItemState(item)
+				end)
+			end
+
+			if equipped then
+				backpackItemEquipped:Fire(item)
+			end
+		elseif record.state ~= currentState then
+			record.state = currentState
+			if equipped then
+				backpackItemEquipped:Fire(item)
+			else
+				backpackItemUnequipped:Fire(item)
+			end
+		end
+
+		notify()
+	end
+
+	local function handleItemRemoval(item: Tool | HopperBin)
+		task.defer(function()
+			if isInventoryItem(item, backpack, character) then
+				handleItemState(item)
+				return
+			end
+
+			local record = trackedItems[item]
+			if not record then
+				return
+			end
+
+			if record.connection then
+				record.connection:Disconnect()
+			end
+			trackedItems[item] = nil
+
+			removeFromSlots(item)
+			backpackItemRemoved:Fire(item)
+			notify()
+		end)
+	end
+
+	local function onChildAdded(child: Instance)
+		if child:IsA("Tool") or child:IsA("HopperBin") then
+			handleItemState(child :: Tool | HopperBin)
+		elseif child:IsA("Humanoid") and character and child.Parent == character then
+			-- Humanoid available for equip calls
+		end
+	end
+
+	local function onChildRemoved(child: Instance)
+		if child:IsA("Tool") or child:IsA("HopperBin") then
+			handleItemRemoval(child :: Tool | HopperBin)
+		end
+	end
+
+	local function clearTracked()
+		for item, record in trackedItems do
+			if record.connection then
+				record.connection:Disconnect()
+			end
+		end
+		table.clear(trackedItems)
+		table.clear(items)
+		table.clear(itemToSlot)
+	end
+
+	local function monitorInventory(char: Model, pack: Backpack)
+		character = char
+		backpack = pack
+
+		table.insert(connections, char.ChildAdded:Connect(onChildAdded))
+		table.insert(connections, char.ChildRemoved:Connect(onChildRemoved))
+		table.insert(connections, pack.ChildAdded:Connect(onChildAdded))
+		table.insert(connections, pack.ChildRemoved:Connect(onChildRemoved))
+
+		for _, child in pack:GetChildren() do
+			onChildAdded(child)
+		end
+		for _, child in char:GetChildren() do
+			onChildAdded(child)
+		end
+
+		notify()
+	end
+
+	local function onCharacterAdded(char: Model)
+		for _, conn in connections do
+			conn:Disconnect()
+		end
+		table.clear(connections)
+		clearTracked()
+
+		local pack = player:WaitForChild("Backpack") :: Backpack
+		monitorInventory(char, pack)
+	end
+
+	table.insert(connections, player.CharacterAdded:Connect(onCharacterAdded))
+	if player.Character then
+		onCharacterAdded(player.Character)
+	end
+
+	local function getSnapshot(): Snapshot
+		local snapshotItems: { [number]: SlotItem } = {}
+		for index, item in items do
+			snapshotItems[index] = {
+				item = item,
+				equipped = isEquipped(item),
+			}
+		end
+		return { items = snapshotItems }
+	end
+
+	local function activateItem(item: Tool | HopperBin)
+		if item:IsA("HopperBin") then
+			warn(`[Satchel] Cannot select '{item}' hopper. HopperBin is deprecated and not supported.`)
+			return
+		end
+
+		local char = character
+		if not char then
+			return
+		end
+
+		local humanoid = char:FindFirstChildOfClass("Humanoid")
+		if not humanoid then
+			return
+		end
+
+		if isEquipped(item) then
+			humanoid:UnequipTools()
+		else
+			humanoid:EquipTool(item)
+		end
+	end
+
+	local function setHotbarSlotCount(count: number)
+		hotbarSlotCount = count
+		notify()
+	end
+
+	local function subscribe(listener: () -> ()): () -> ()
+		table.insert(listeners, listener)
+		return function()
+			local index = table.find(listeners, listener)
+			if index then
+				table.remove(listeners, index)
+			end
+		end
+	end
+
+	local function destroy()
+		for _, conn in connections do
+			conn:Disconnect()
+		end
+		table.clear(connections)
+		clearTracked()
+		table.clear(listeners)
+		character = nil
+		backpack = nil
+	end
+
+	return {
+		getSnapshot = getSnapshot,
+		activateItem = activateItem,
+		setHotbarSlotCount = setHotbarSlotCount,
+		subscribe = subscribe,
+		destroy = destroy,
+	}
+end
+
+return {
+	create = create,
+}

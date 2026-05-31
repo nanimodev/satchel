@@ -28,7 +28,7 @@ return {
 
 		return e(Hotbar, {
 			slots = props.controls.slots,
-			items = { [props.controls.toolSlot] = tool },
+			items = { [props.controls.toolSlot] = { item = tool, equipped = false } },
 			opened = props.controls.opened,
 		})
 	end,

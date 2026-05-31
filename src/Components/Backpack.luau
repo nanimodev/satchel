@@ -9,8 +9,9 @@ export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
 	rows: number?, -- TODO: Add rows for inventory height
-	items: { Tool | HopperBin }?,
+	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
 	opened: boolean?,
+	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
 	onAbsoluteSizeChanged: ((Vector2) -> ())?,
 }
 
@@ -19,14 +20,14 @@ const function Backpack(props: Props)
 	const slots = props.slots or 10
 
 	-- Items at indices 1..slots are hotbar; items above slots are inventory.
-	const hotbarItems: { [number]: Tool | HopperBin } = {}
-	const inventoryItems: { [number]: Tool | HopperBin } = {}
+	const hotbarItems: { [number]: { item: Tool | HopperBin, equipped: boolean } } = {}
+	const inventoryItems: { [number]: { item: Tool | HopperBin, equipped: boolean } } = {}
 	if props.items then
-		for index, item in props.items do
-			if item and index > 0 and index <= slots then
-				hotbarItems[index] = item
-			elseif item and index > slots then
-				inventoryItems[index - slots] = item
+		for index, slot in props.items do
+			if slot and index > 0 and index <= slots then
+				hotbarItems[index] = slot
+			elseif slot and index > slots then
+				inventoryItems[index - slots] = slot
 			end
 		end
 	end
@@ -44,12 +45,14 @@ const function Backpack(props: Props)
 			slots = slots,
 			items = hotbarItems,
 			opened = opened,
+			onSlotActivated = props.onSlotActivated,
 		}),
 		Inventory = e(Inventory, {
 			slots = slots,
 			rows = props.rows,
 			items = inventoryItems,
 			opened = opened,
+			onSlotActivated = props.onSlotActivated,
 		}),
 	})
 end

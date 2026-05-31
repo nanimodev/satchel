@@ -8,8 +8,9 @@ const e = React.createElement
 export type Props = {
 	width: number?,
 	rows: number?,
-	items: { Tool | HopperBin }?,
+	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
 	opened: boolean?,
+	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
 }
 
 const function Inventory(props: Props)
@@ -21,12 +22,14 @@ const function Inventory(props: Props)
 
 	-- Create inventory slots
 	if props.items then
-		for order, item in props.items do
-			if item then
+		for order, slot in props.items do
+			if slot then
 				children[tostring(order)] = e(Slot, {
 					unlocked = true,
 					order = order,
-					item = item,
+					item = slot.item,
+					equipped = slot.equipped,
+					onActivated = props.onSlotActivated,
 				})
 			end
 		end

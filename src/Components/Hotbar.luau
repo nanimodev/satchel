@@ -7,8 +7,9 @@ const e = React.createElement
 export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
-	items: { Tool | HopperBin }?,
+	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
 	opened: boolean?,
+	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
 }
 
 const function Hotbar(props: Props)
@@ -18,7 +19,8 @@ const function Hotbar(props: Props)
 
 	-- Create hotbar slots
 	for order = 1, slotCount do
-		const item = props.items and props.items[order]
+		const slot = props.items and props.items[order]
+		const item = slot and slot.item
 		const slotUnlocked = props.opened and item ~= nil
 
 		-- Only show slots if the hotbar is opened or if there is a tool in the slot
@@ -29,6 +31,8 @@ const function Hotbar(props: Props)
 				hint = true,
 				forceHintVisible = props.forceKeyboardHintVisible,
 				unlocked = slotUnlocked,
+				equipped = slot and slot.equipped,
+				onActivated = props.onSlotActivated,
 			})
 		end
 	end

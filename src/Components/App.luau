@@ -20,8 +20,9 @@ export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
 	rows: number?,
-	items: { Tool | HopperBin }?,
+	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
 	opened: boolean?,
+	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
 }
 
 const function App(props: Props)
@@ -87,6 +88,7 @@ const function App(props: Props)
 				rows = props.rows,
 				items = props.items,
 				opened = props.opened,
+				onSlotActivated = props.onSlotActivated,
 				onAbsoluteSizeChanged = setBackpackSize,
 			}),
 		}),

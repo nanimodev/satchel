@@ -29,7 +29,7 @@ return {
 
 		return e(Backpack, {
 			slots = props.controls.slots,
-			items = { [props.controls.toolSlot] = tool },
+			items = { [props.controls.toolSlot] = { item = tool, equipped = false } },
 			opened = props.controls.opened,
 			rows = props.controls.rows,
 		})

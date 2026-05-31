@@ -11,6 +11,7 @@ export type Props = {
 	forceHintVisible: boolean?,
 	hint: boolean?,
 	order: number?,
+	onActivated: ((item: Tool | HopperBin) -> ())?,
 }
 
 const function Slot(props: Props)
@@ -19,7 +20,7 @@ const function Slot(props: Props)
 	const itemImage = item and item.TextureId
 	const tooltipText = item and (item:IsA("Tool") and item.ToolTip or "")
 
-	local equipped, setEquipped = React.useState(props.equipped or false)
+	local equipped = props.equipped or false
 
 	-- Only show numbers 1-10 for hints and show 0 for the 10th slot
 	const order = props.order or 1
@@ -52,8 +53,8 @@ const function Slot(props: Props)
 		LayoutOrder = props.order,
 		[React.Tag] = tags,
 		[React.Event.Activated] = function()
-			if props.item then
-				setEquipped(not equipped)
+			if props.item and props.onActivated then
+				props.onActivated(props.item)
 			end
 		end :: any,
 	}, {

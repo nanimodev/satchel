@@ -17,6 +17,7 @@ const ReactRoblox = require("../react-roblox")
 const closeInventory = require("./Api/closeInventory")
 
 const App = require("./Components/App")
+const useBackpack = require("./Hooks/useBackpack")
 
 const DESIGN_SHEET = script.Parent.Design.SatchelStyleSheet
 
@@ -106,10 +107,15 @@ const function Satchel()
 		end
 	end, {})
 
+	const bindableEvents = script.Parent.BindableEvents
+	const backpack = useBackpack(player, bindableEvents, slots)
+
 	return e(App, {
 		slots = slots,
 		rows = rows,
 		opened = opened,
+		items = backpack.items,
+		onSlotActivated = backpack.onSlotActivated,
 	})
 end
 

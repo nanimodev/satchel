@@ -27,7 +27,7 @@ return {
 		return e(Inventory, {
 			rows = props.controls.rows,
 			width = 655,
-			items = { [1] = tool },
+			items = { [1] = { item = tool, equipped = false } },
 		})
 	end,
 }
