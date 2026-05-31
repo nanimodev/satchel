@@ -1,5 +1,7 @@
 --!strict
 
+-- TODO: Refactor to be more clean
+
 export type SlotItem = {
 	item: BackpackItem,
 	equipped: boolean,
@@ -17,18 +19,20 @@ export type Controller = {
 	destroy: () -> (),
 }
 
-local function isInventoryItem(item: Instance, backpack: Backpack?, character: Model?): boolean
+const DEFAULT_HOTBAR_SLOT_COUNT = 10
+
+const function isInventoryItem(item: Instance, backpack: Backpack?, character: Model?): boolean
 	local parent = item.Parent
 	return parent == backpack or parent == character
 end
 
-local function create(player: Player, bindableEvents: Folder): Controller
-	local backpackItemAdded = bindableEvents.BackpackItemAdded
-	local backpackItemRemoved = bindableEvents.BackpackItemRemoved
-	local backpackItemEquipped = bindableEvents.BackpackItemEquipped
-	local backpackItemUnequipped = bindableEvents.BackpackItemUnequipped
+const function create(player: Player, bindableEvents: Folder): Controller
+	const backpackItemAdded = bindableEvents.BackpackItemAdded
+	const backpackItemRemoved = bindableEvents.BackpackItemRemoved
+	const backpackItemEquipped = bindableEvents.BackpackItemEquipped
+	const backpackItemUnequipped = bindableEvents.BackpackItemUnequipped
 
-	local hotbarSlotCount = 10
+	local hotbarSlotCount = DEFAULT_HOTBAR_SLOT_COUNT
 	local items: { [number]: BackpackItem } = {}
 	local itemToSlot: { [BackpackItem]: number } = {}
 	local trackedItems: { [BackpackItem]: { state: string, connection: RBXScriptConnection? } } = {}
@@ -38,22 +42,23 @@ local function create(player: Player, bindableEvents: Folder): Controller
 	local character: Model? = nil
 	local backpack: Backpack? = nil
 
-	local function notify()
+	const function notify()
 		for _, listener in listeners do
 			listener()
 		end
 	end
 
-	local function isEquipped(item: BackpackItem): boolean
+	const function isEquipped(item: BackpackItem): boolean
 		if item:IsA("HopperBin") then
 			return item.Active
-		elseif item:IsA("Tool") then
+		end
+		if item:IsA("Tool") then
 			return character ~= nil and item.Parent == character
 		end
 		return false
 	end
 
-	local function findLowestEmptySlot(): number
+	const function findLowestEmptySlot(): number
 		for index = 1, hotbarSlotCount do
 			if items[index] == nil then
 				return index
@@ -68,7 +73,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		return maxIndex + 1
 	end
 
-	local function removeFromSlots(item: BackpackItem)
+	const function removeFromSlots(item: BackpackItem)
 		local slotIndex = itemToSlot[item]
 		if slotIndex then
 			items[slotIndex] = nil
@@ -76,17 +81,17 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		end
 	end
 
-	local function handleItemState(item: BackpackItem)
-		local equipped = isEquipped(item)
-		local currentState = if equipped then "Equipped" else "Unequipped"
+	const function handleItemState(item: BackpackItem)
+		const equipped = isEquipped(item)
+		const currentState = if equipped then "Equipped" else "Unequipped"
 
-		local record = trackedItems[item]
+		const record = trackedItems[item]
 		if not record then
 			if not isInventoryItem(item, backpack, character) then
 				return
 			end
 
-			local slotIndex = findLowestEmptySlot()
+			const slotIndex = findLowestEmptySlot()
 			items[slotIndex] = item
 			itemToSlot[item] = slotIndex
 
@@ -118,14 +123,14 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		notify()
 	end
 
-	local function handleItemRemoval(item: BackpackItem)
+	const function handleItemRemoval(item: BackpackItem)
 		task.defer(function()
 			if isInventoryItem(item, backpack, character) then
 				handleItemState(item)
 				return
 			end
 
-			local record = trackedItems[item]
+			const record = trackedItems[item]
 			if not record then
 				return
 			end
@@ -141,21 +146,19 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		end)
 	end
 
-	local function onChildAdded(child: Instance)
+	const function onChildAdded(child: Instance)
 		if child:IsA("Tool") or child:IsA("HopperBin") then
 			handleItemState(child :: BackpackItem)
-		elseif child:IsA("Humanoid") and character and child.Parent == character then
-			-- Humanoid available for equip calls
 		end
 	end
 
-	local function onChildRemoved(child: Instance)
+	const function onChildRemoved(child: Instance)
 		if child:IsA("Tool") or child:IsA("HopperBin") then
 			handleItemRemoval(child :: BackpackItem)
 		end
 	end
 
-	local function clearTracked()
+	const function clearTracked()
 		for item, record in trackedItems do
 			if record.connection then
 				record.connection:Disconnect()
@@ -166,7 +169,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		table.clear(itemToSlot)
 	end
 
-	local function monitorInventory(char: Model, pack: Backpack)
+	const function monitorInventory(char: Model, pack: Backpack)
 		character = char
 		backpack = pack
 
@@ -185,14 +188,14 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		notify()
 	end
 
-	local function onCharacterAdded(char: Model)
+	const function onCharacterAdded(char: Model)
 		for _, conn in connections do
 			conn:Disconnect()
 		end
 		table.clear(connections)
 		clearTracked()
 
-		local pack = player:WaitForChild("Backpack") :: Backpack
+		const pack = player:WaitForChild("Backpack") :: Backpack
 		monitorInventory(char, pack)
 	end
 
@@ -201,8 +204,8 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		onCharacterAdded(player.Character)
 	end
 
-	local function getSnapshot(): Snapshot
-		local snapshotItems: { [number]: SlotItem } = {}
+	const function getSnapshot(): Snapshot
+		const snapshotItems: { [number]: SlotItem } = {}
 		for index, item in items do
 			snapshotItems[index] = {
 				item = item,
@@ -212,18 +215,18 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		return { items = snapshotItems }
 	end
 
-	local function activateItem(item: BackpackItem)
+	const function activateItem(item: BackpackItem)
 		if item:IsA("HopperBin") then
 			warn(`[Satchel] Cannot select '{item}' hopper. HopperBin is deprecated and not supported.`)
 			return
 		end
 
-		local char = character
+		const char = character
 		if not char then
 			return
 		end
 
-		local humanoid = char:FindFirstChildOfClass("Humanoid")
+		const humanoid = char:FindFirstChildOfClass("Humanoid")
 		if not humanoid then
 			return
 		end
@@ -235,22 +238,22 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		end
 	end
 
-	local function setHotbarSlotCount(count: number)
+	const function setHotbarSlotCount(count: number)
 		hotbarSlotCount = count
 		notify()
 	end
 
-	local function subscribe(listener: () -> ()): () -> ()
+	const function subscribe(listener: () -> ()): () -> ()
 		table.insert(listeners, listener)
 		return function()
-			local index = table.find(listeners, listener)
+			const index = table.find(listeners, listener)
 			if index then
 				table.remove(listeners, index)
 			end
 		end
 	end
 
-	local function destroy()
+	const function destroy()
 		for _, conn in connections do
 			conn:Disconnect()
 		end
