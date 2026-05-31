@@ -5,13 +5,13 @@ const Tooltip = require("./Tooltip")
 const e = React.createElement
 
 export type Props = {
-	item: (Tool | HopperBin)?,
+	item: BackpackItem?,
 	equipped: boolean?,
 	unlocked: boolean?,
 	forceHintVisible: boolean?,
 	hint: boolean?,
 	order: number?,
-	onActivated: ((item: Tool | HopperBin) -> ())?,
+	onActivated: ((item: BackpackItem) -> ())?,
 }
 
 const function Slot(props: Props)

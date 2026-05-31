@@ -1,7 +1,7 @@
 --!strict
 
 export type SlotItem = {
-	item: Tool | HopperBin,
+	item: BackpackItem,
 	equipped: boolean,
 }
 
@@ -11,7 +11,7 @@ export type Snapshot = {
 
 export type Controller = {
 	getSnapshot: () -> Snapshot,
-	activateItem: (item: Tool | HopperBin) -> (),
+	activateItem: (item: BackpackItem) -> (),
 	setHotbarSlotCount: (count: number) -> (),
 	subscribe: (listener: () -> ()) -> () -> (),
 	destroy: () -> (),
@@ -29,9 +29,9 @@ local function create(player: Player, bindableEvents: Folder): Controller
 	local backpackItemUnequipped = bindableEvents.BackpackItemUnequipped
 
 	local hotbarSlotCount = 10
-	local items: { [number]: Tool | HopperBin } = {}
-	local itemToSlot: { [Tool | HopperBin]: number } = {}
-	local trackedItems: { [Tool | HopperBin]: { state: string, connection: RBXScriptConnection? } } = {}
+	local items: { [number]: BackpackItem } = {}
+	local itemToSlot: { [BackpackItem]: number } = {}
+	local trackedItems: { [BackpackItem]: { state: string, connection: RBXScriptConnection? } } = {}
 	local listeners: { () -> () } = {}
 	local connections: { RBXScriptConnection } = {}
 
@@ -44,7 +44,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		end
 	end
 
-	local function isEquipped(item: Tool | HopperBin): boolean
+	local function isEquipped(item: BackpackItem): boolean
 		if item:IsA("HopperBin") then
 			return item.Active
 		elseif item:IsA("Tool") then
@@ -68,7 +68,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		return maxIndex + 1
 	end
 
-	local function removeFromSlots(item: Tool | HopperBin)
+	local function removeFromSlots(item: BackpackItem)
 		local slotIndex = itemToSlot[item]
 		if slotIndex then
 			items[slotIndex] = nil
@@ -76,7 +76,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		end
 	end
 
-	local function handleItemState(item: Tool | HopperBin)
+	local function handleItemState(item: BackpackItem)
 		local equipped = isEquipped(item)
 		local currentState = if equipped then "Equipped" else "Unequipped"
 
@@ -118,7 +118,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		notify()
 	end
 
-	local function handleItemRemoval(item: Tool | HopperBin)
+	local function handleItemRemoval(item: BackpackItem)
 		task.defer(function()
 			if isInventoryItem(item, backpack, character) then
 				handleItemState(item)
@@ -143,7 +143,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 
 	local function onChildAdded(child: Instance)
 		if child:IsA("Tool") or child:IsA("HopperBin") then
-			handleItemState(child :: Tool | HopperBin)
+			handleItemState(child :: BackpackItem)
 		elseif child:IsA("Humanoid") and character and child.Parent == character then
 			-- Humanoid available for equip calls
 		end
@@ -151,7 +151,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 
 	local function onChildRemoved(child: Instance)
 		if child:IsA("Tool") or child:IsA("HopperBin") then
-			handleItemRemoval(child :: Tool | HopperBin)
+			handleItemRemoval(child :: BackpackItem)
 		end
 	end
 
@@ -212,7 +212,7 @@ local function create(player: Player, bindableEvents: Folder): Controller
 		return { items = snapshotItems }
 	end
 
-	local function activateItem(item: Tool | HopperBin)
+	local function activateItem(item: BackpackItem)
 		if item:IsA("HopperBin") then
 			warn(`[Satchel] Cannot select '{item}' hopper. HopperBin is deprecated and not supported.`)
 			return

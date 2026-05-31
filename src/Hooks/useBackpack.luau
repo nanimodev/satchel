@@ -10,7 +10,7 @@ export type BackpackState = {
 
 	items: { [number]: SlotItem },
 
-	onSlotActivated: (item: Tool | HopperBin) -> (),
+	onSlotActivated: (item: BackpackItem) -> (),
 }
 
 local function useBackpack(player: Player, bindableEvents: Folder, hotbarSlotCount: number): BackpackState
@@ -52,7 +52,7 @@ local function useBackpack(player: Player, bindableEvents: Folder, hotbarSlotCou
 		end
 	end, { hotbarSlotCount })
 
-	local onSlotActivated = React.useCallback(function(item: Tool | HopperBin)
+	local onSlotActivated = React.useCallback(function(item: BackpackItem)
 		local controller = controllerRef.current
 
 		if controller then

@@ -7,9 +7,9 @@ const e = React.createElement
 export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
-	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
+	items: { [number]: { item: BackpackItem, equipped: boolean } }?,
 	opened: boolean?,
-	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
+	onSlotActivated: ((item: BackpackItem) -> ())?,
 }
 
 const function Hotbar(props: Props)

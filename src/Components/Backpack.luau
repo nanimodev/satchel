@@ -9,10 +9,10 @@ export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
 	rows: number?, -- TODO: Add rows for inventory height
-	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
+	items: { [number]: { item: BackpackItem, equipped: boolean } }?,
 	opened: boolean?,
 	width: number?,
-	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
+	onSlotActivated: ((item: BackpackItem) -> ())?,
 	onAbsoluteSizeChanged: ((Vector2) -> ())?,
 }
 
@@ -21,8 +21,8 @@ const function Backpack(props: Props)
 	const slots = props.slots or 10
 
 	-- Items at indices 1..slots are hotbar; items above slots are inventory.
-	const hotbarItems: { [number]: { item: Tool | HopperBin, equipped: boolean } } = {}
-	const inventoryItems: { [number]: { item: Tool | HopperBin, equipped: boolean } } = {}
+	const hotbarItems: { [number]: { item: BackpackItem, equipped: boolean } } = {}
+	const inventoryItems: { [number]: { item: BackpackItem, equipped: boolean } } = {}
 	if props.items then
 		for index, slot in props.items do
 			if slot and index > 0 and index <= slots then

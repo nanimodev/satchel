@@ -8,9 +8,9 @@ const e = React.createElement
 export type Props = {
 	width: number?,
 	rows: number?,
-	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
+	items: { [number]: { item: BackpackItem, equipped: boolean } }?,
 	opened: boolean?,
-	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
+	onSlotActivated: ((item: BackpackItem) -> ())?,
 }
 
 const function Inventory(props: Props)

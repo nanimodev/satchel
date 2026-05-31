@@ -20,9 +20,9 @@ export type Props = {
 	forceKeyboardHintVisible: boolean?,
 	slots: number?,
 	rows: number?,
-	items: { [number]: { item: Tool | HopperBin, equipped: boolean } }?,
+	items: { [number]: { item: BackpackItem, equipped: boolean } }?,
 	opened: boolean?,
-	onSlotActivated: ((item: Tool | HopperBin) -> ())?,
+	onSlotActivated: ((item: BackpackItem) -> ())?,
 }
 
 const function App(props: Props)
