@@ -4,10 +4,6 @@
 const React = require("../../react")
 
 const bindableEvents = script.Parent.Parent.BindableEvents
-const itemAdded = bindableEvents.BackpackItemAdded
-const itemRemoved = bindableEvents.BackpackItemRemoved
-const itemEquipped = bindableEvents.BackpackItemEquipped
-const itemUnequipped = bindableEvents.BackpackItemUnequipped
 
 export type BackpackState = {
 	items: { [number]: { item: BackpackItem, equipped: boolean } },
@@ -65,7 +61,7 @@ const function useBackpack(player: Player, hotbarSlotCount: number): BackpackSta
 			slots[index] = nil
 			slotByTool[tool] = nil
 			equippedState[tool] = nil
-			itemRemoved:Fire(tool)
+			bindableEvents.BackpackItemRemoved:Fire(tool)
 		end
 
 		local function updateEquip(tool: Tool)
@@ -74,14 +70,14 @@ const function useBackpack(player: Player, hotbarSlotCount: number): BackpackSta
 			if was == nil then
 				equippedState[tool] = now
 				if now then
-					itemEquipped:Fire(tool)
+					bindableEvents.BackpackItemEquipped:Fire(tool)
 				end
 			elseif was ~= now then
 				equippedState[tool] = now
 				if now then
-					itemEquipped:Fire(tool)
+					bindableEvents.BackpackItemEquipped:Fire(tool)
 				else
-					itemUnequipped:Fire(tool)
+					bindableEvents.BackpackItemUnequipped:Fire(tool)
 				end
 			end
 		end
@@ -96,7 +92,7 @@ const function useBackpack(player: Player, hotbarSlotCount: number): BackpackSta
 			local index = if emptyHotbar then emptyHotbar else nextInventorySlot()
 			slots[index] = tool
 			slotByTool[tool] = index
-			itemAdded:Fire(tool)
+			bindableEvents.BackpackItemAdded:Fire(tool)
 			updateEquip(tool)
 		end
 
