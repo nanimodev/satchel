@@ -10,7 +10,6 @@ icon:modifyTheme({
 	{ "IconLabelContainer", "TargetWidth", 0 }, -- Force minimum width
 	{ "IconLabel", "AutoLocalize", false }, -- Don't translate font icon
 })
-icon:select()
 icon:setLabel("two-switches-horizontal")
 icon:align("Right")
 icon:setTextSize(24)
@@ -34,3 +33,4 @@ icon.toggled:Connect(function(isSelected, fromSource)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, not isSelected)
 	end
 end)
+icon:select()
