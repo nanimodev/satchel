@@ -14,6 +14,7 @@ const SlotLeftGamepadKeyCode = HotbarBindings.SlotLeftAction.GamepadBinding.KeyC
 const SlotRightGamepadKeyCode = HotbarBindings.SlotRightAction.GamepadBinding.KeyCode
 
 const e = React.createElement
+const useState = React.useState
 
 export type Props = {
 	forceGamepadHintVisible: boolean?,
@@ -26,7 +27,7 @@ export type Props = {
 }
 
 const function App(props: Props)
-	const backpackSize, setBackpackSize = React.useState(Vector2.zero)
+	const backpackSize, setBackpackSize = useState(Vector2.zero)
 	const slotCount = props.slots or 10
 	const width = slotCount * 65 + 5
 

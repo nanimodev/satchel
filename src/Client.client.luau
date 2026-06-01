@@ -17,11 +17,13 @@ const ReactRoblox = require("../react-roblox")
 const closeInventory = require("./Api/closeInventory")
 
 const App = require("./Components/App")
-const useBackpack = require("./Hooks/useBackpack")
+const useBackpack = require("./Components/useBackpack")
 
 const DESIGN_SHEET = script.Parent.Design.SatchelStyleSheet
 
 const e = React.createElement
+const useState = React.useState
+const useEffect = React.useEffect
 
 const player = Players.LocalPlayer :: Player
 const playerGui = player:WaitForChild("PlayerGui") :: PlayerGui
@@ -37,9 +39,9 @@ const root = ReactRoblox.createRoot(handle)
 
 const function Satchel()
 	-- Open and close backpack based on bindable events
-	const opened, setOpened = React.useState(false)
+	const opened, setOpened = useState(false)
 
-	React.useEffect(function()
+	useEffect(function()
 		const bindableEvents = script.Parent.BindableEvents
 
 		const inventoryOpenedSignal = bindableEvents.InventoryOpened.Event:Connect(function()
@@ -60,7 +62,7 @@ const function Satchel()
 	end, {})
 
 	-- Close backpack when clicking outside of it
-	React.useEffect(function()
+	useEffect(function()
 		const inputSignal = UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 			const inputType = input.UserInputType
 			if not gameProcessedEvent then
@@ -76,10 +78,10 @@ const function Satchel()
 	end, {})
 
 	-- Change slots based on viewport display size
-	const slots, setSlots = React.useState(10)
-	const rows, setRows = React.useState(4)
+	const slots, setSlots = useState(10)
+	const rows, setRows = useState(4)
 
-	React.useEffect(function()
+	useEffect(function()
 		const function updateBackpackSize()
 			const screenOrientation = playerGui.CurrentScreenOrientation
 			const viewportSize = GuiService.ViewportDisplaySize

@@ -1,13 +1,14 @@
 const React = require("../../react")
 
 const e = React.createElement
+const useState = React.useState
 
 export type Props = {
 	size: UDim2?,
 }
 
 const function Searchbar(props: Props)
-	const text, setText = React.useState("")
+	const text, setText = useState("")
 
 	return e("TextBox", {
 		Size = props.size,
