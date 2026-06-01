@@ -18,16 +18,13 @@ export type BackpackState = {
 	onSlotActivated: (item: BackpackItem) -> (),
 }
 
-const function inInventory(item: Instance, backpack: Backpack?, character: Model?): boolean
-	local parent = item.Parent
+const function inInventory(tool: Tool, backpack: Backpack?, character: Model?): boolean
+	local parent = tool.Parent
 	return parent == backpack or parent == character
 end
 
-const function equipped(item: BackpackItem, character: Model?): boolean
-	if item:IsA("HopperBin") then
-		return item.Active
-	end
-	return item:IsA("Tool") and character ~= nil and item.Parent == character
+const function equipped(tool: Tool, character: Model?): boolean
+	return character ~= nil and tool.Parent == character
 end
 
 type Store = {
@@ -38,9 +35,9 @@ type Store = {
 }
 
 const function createStore(player: Player, hotbarSlots: number): Store
-	local slots: { [number]: BackpackItem } = {}
-	local itemToSlot: { [BackpackItem]: number } = {}
-	local tracked: { [BackpackItem]: { state: string, connection: RBXScriptConnection? } } = {}
+	local slots: { [number]: Tool } = {}
+	local itemToSlot: { [Tool]: number } = {}
+	local equippedState: { [Tool]: boolean } = {}
 	local listeners: { () -> () } = {}
 	local connections: { RBXScriptConnection } = {}
 	local character: Model? = nil
@@ -65,74 +62,70 @@ const function createStore(player: Player, hotbarSlots: number): Store
 		return maxIndex + 1
 	end
 
-	const function untrack(item: BackpackItem)
-		local record = tracked[item]
-		if not record then
-			return
-		end
-		if record.connection then
-			record.connection:Disconnect()
-		end
-		tracked[item] = nil
-		local index = itemToSlot[item]
+	const function remove(tool: Tool): boolean
+		local index = itemToSlot[tool]
 		if index then
 			slots[index] = nil
-			itemToSlot[item] = nil
+			itemToSlot[tool] = nil
+			equippedState[tool] = nil
+			itemRemoved:Fire(tool)
+			return true
 		end
-		itemRemoved:Fire(item)
+		return false
 	end
 
-	const function onItemChanged(item: BackpackItem)
-		local isEquipped = equipped(item, character)
-		local state = if isEquipped then "Equipped" else "Unequipped"
+	const function onToolChanged(tool: Tool)
+		if not inInventory(tool, backpack, character) then
+			if remove(tool) then
+				notify()
+			end
+			return
+		end
 
-		local record = tracked[item]
-		if not record then
-			if not inInventory(item, backpack, character) then
-				return
-			end
-			local index = nextSlot()
-			slots[index] = item
-			itemToSlot[item] = index
-			tracked[item] = { state = state, connection = nil }
-			itemAdded:Fire(item)
-			if item:IsA("HopperBin") then
-				tracked[item].connection = item:GetPropertyChangedSignal("Active"):Connect(function()
-					onItemChanged(item)
-				end)
-			end
+		local slot = itemToSlot[tool]
+		if slot == nil then
+			slot = nextSlot()
+			slots[slot] = tool
+			itemToSlot[tool] = slot
+			itemAdded:Fire(tool)
+		end
+
+		local isEquipped = equipped(tool, character)
+		local wasEquipped = equippedState[tool]
+		if wasEquipped == nil then
+			equippedState[tool] = isEquipped
 			if isEquipped then
-				itemEquipped:Fire(item)
+				itemEquipped:Fire(tool)
 			end
-		elseif record.state ~= state then
-			record.state = state
+		elseif wasEquipped ~= isEquipped then
+			equippedState[tool] = isEquipped
 			if isEquipped then
-				itemEquipped:Fire(item)
+				itemEquipped:Fire(tool)
 			else
-				itemUnequipped:Fire(item)
+				itemUnequipped:Fire(tool)
 			end
 		end
+
 		notify()
 	end
 
 	const function onChildAdded(child: Instance)
-		if child:IsA("BackpackItem") then
-			onItemChanged(child :: BackpackItem)
+		if child:IsA("Tool") then
+			onToolChanged(child)
 		end
 	end
 
 	const function onChildRemoved(child: Instance)
-		if not child:IsA("BackpackItem") then
+		if not child:IsA("Tool") then
 			return
 		end
-		local item = child :: BackpackItem
+		local tool = child :: Tool
 		task.defer(function()
-			if inInventory(item, backpack, character) then
-				onItemChanged(item)
+			if inInventory(tool, backpack, character) then
+				onToolChanged(tool)
 				return
 			end
-			if tracked[item] then
-				untrack(item)
+			if remove(tool) then
 				notify()
 			end
 		end)
@@ -143,14 +136,9 @@ const function createStore(player: Player, hotbarSlots: number): Store
 			conn:Disconnect()
 		end
 		table.clear(connections)
-		for _, record in tracked do
-			if record.connection then
-				record.connection:Disconnect()
-			end
-		end
-		table.clear(tracked)
 		table.clear(slots)
 		table.clear(itemToSlot)
+		table.clear(equippedState)
 	end
 
 	const function onCharacterAdded(char: Model)
@@ -184,8 +172,7 @@ const function createStore(player: Player, hotbarSlots: number): Store
 			return { items = items }
 		end,
 		activateItem = function(item: BackpackItem)
-			if item:IsA("HopperBin") then
-				warn(`[Satchel] Cannot select '{item}' hopper. HopperBin is deprecated and not supported.`)
+			if not item:IsA("Tool") then
 				return
 			end
 			local char = character
