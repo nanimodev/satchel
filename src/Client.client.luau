@@ -109,8 +109,7 @@ const function Satchel()
 		end
 	end, {})
 
-	const bindableEvents = script.Parent.BindableEvents
-	const backpack = useBackpack(player, bindableEvents, slots)
+	const backpack = useBackpack(player, slots)
 
 	return e(App, {
 		slots = slots,
