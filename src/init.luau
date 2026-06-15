@@ -514,17 +514,8 @@ local function MakeSlot(parent: Instance, initIndex: number?): GuiObject
 		local override = unequippedOverride or false
 		if not override and IsEquipped(self.Tool) then -- Equipped
 			lastEquippedSlot = slot
-			if not HighlightFrame then
-				HighlightFrame = Instance.new("UIStroke")
-				HighlightFrame.Name = "Border"
-				HighlightFrame.Thickness = SLOT_EQUIP_THICKNESS
-				HighlightFrame.Color = SLOT_EQUIP_COLOR
-				HighlightFrame.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			end
-			if LEGACY_EDGE_ENABLED == true then
-				HighlightFrame.Parent = ToolIcon
-			else
-				HighlightFrame.Parent = SlotFrame
+			if HighlightFrame then
+				HighlightFrame.Parent = nil
 			end
 		else -- In the Backpack
 			if HighlightFrame then
